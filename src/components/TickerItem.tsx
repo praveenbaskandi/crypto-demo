@@ -9,6 +9,7 @@ import Animated, {
 import { COLORS } from "../constants/color";
 import { STRINGS } from "../constants/string";
 import { Ticker } from "../redux/types";
+import { getCurrencyLogo, getCurrencyName } from "../utils/currency";
 
 interface TickerItemProps {
   item: Ticker;
@@ -45,11 +46,16 @@ const TickerItem: React.FC<TickerItemProps> = React.memo(({ item }) => {
     <Animated.View style={[styles.container, animatedStyle]}>
       <View style={styles.mainRow}>
         <View style={styles.leftContainer}>
-          <Text style={styles.symbol}>{item.symbol.toUpperCase()}</Text>
-          <Text style={styles.price}>
-            {STRINGS.pricePrefix}
-            {item.price.toFixed(2)}
-          </Text>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logo}>{getCurrencyLogo(item.symbol)}</Text>
+          </View>
+          <View style={styles.nameAndPriceContainer}>
+            <Text style={styles.symbol}>{getCurrencyName(item.symbol)}</Text>
+            <Text style={styles.price}>
+              {STRINGS.pricePrefix}
+              {item.price.toFixed(2)}
+            </Text>
+          </View>
         </View>
         <View style={styles.rightContainer}>
           <View
@@ -163,6 +169,25 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   leftContainer: {
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "center",
+  },
+  logoContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.backgroundLight,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+  },
+  logo: {
+    fontSize: 24,
+    textAlign: "center",
+  },
+  nameAndPriceContainer: {
     flexDirection: "column",
     gap: 4,
   },
