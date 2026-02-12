@@ -1,40 +1,27 @@
-import React, { useEffect, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withTiming,
-} from "react-native-reanimated";
-import { COLORS } from "../constants/color";
+import React from "react";
+import { Text, View } from "react-native";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { STRINGS } from "../constants/string";
+import { useTickerAnimation } from "../hooks/useTickerAnimation";
 import { Ticker } from "../redux/types";
 import { getCurrencyLogo, getCurrencyName } from "../utils/currency";
+import {
+  formatChange,
+  formatPercentChange,
+  formatPrice,
+  formatStatValue,
+  formatTrades,
+  formatVolume,
+  getChangeColor,
+} from "../utils/format";
+import { styles } from "./TickerItem.styles";
 
 interface TickerItemProps {
   item: Ticker;
 }
 
 const TickerItem: React.FC<TickerItemProps> = React.memo(({ item }) => {
-  const prevPriceRef = useRef<number>(item.price);
-  const backgroundColor = useSharedValue<string>(COLORS.transparent);
-
-  useEffect(() => {
-    if (item.price > prevPriceRef.current) {
-      // Price increased - Flash Green
-      backgroundColor.value = withSequence(
-        withTiming(COLORS.flashGreen, { duration: 100 }),
-        withTiming(COLORS.transparent, { duration: 300 }),
-      );
-    } else if (item.price < prevPriceRef.current) {
-      // Price decreased - Flash Red
-      backgroundColor.value = withSequence(
-        withTiming(COLORS.flashRed, { duration: 100 }),
-        withTiming(COLORS.transparent, { duration: 300 }),
-      );
-    }
-    prevPriceRef.current = item.price;
-  }, [item.price]);
+  const { backgroundColor } = useTickerAnimation(item.price);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -51,10 +38,7 @@ const TickerItem: React.FC<TickerItemProps> = React.memo(({ item }) => {
           </View>
           <View style={styles.nameAndPriceContainer}>
             <Text style={styles.symbol}>{getCurrencyName(item.symbol)}</Text>
-            <Text style={styles.price}>
-              {STRINGS.pricePrefix}
-              {item.price.toFixed(2)}
-            </Text>
+            <Text style={styles.price}>{formatPrice(item.price)}</Text>
           </View>
         </View>
         <View style={styles.rightContainer}>
@@ -62,17 +46,15 @@ const TickerItem: React.FC<TickerItemProps> = React.memo(({ item }) => {
             style={[
               styles.changePill,
               {
-                backgroundColor:
-                  item.percentChange >= 0
-                    ? COLORS.positiveBackground
-                    : COLORS.negativeBackground,
+                backgroundColor: getChangeColor(
+                  item.percentChange,
+                  "background",
+                ),
               },
             ]}
           >
             <Text style={styles.percentChange}>
-              {item.percentChange >= 0 ? STRINGS.positiveChangePrefix : ""}
-              {item.percentChange.toFixed(2)}
-              {STRINGS.percentSuffix}
+              {formatPercentChange(item.percentChange)}
             </Text>
           </View>
         </View>
@@ -81,60 +63,37 @@ const TickerItem: React.FC<TickerItemProps> = React.memo(({ item }) => {
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{STRINGS.highLabel}</Text>
-            <Text style={styles.statValue}>
-              {item.high?.toFixed(2) ?? STRINGS.placeholder}
-            </Text>
+            <Text style={styles.statValue}>{formatStatValue(item.high)}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{STRINGS.lowLabel}</Text>
-            <Text style={styles.statValue}>
-              {item.low?.toFixed(2) ?? STRINGS.placeholder}
-            </Text>
+            <Text style={styles.statValue}>{formatStatValue(item.low)}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{STRINGS.volLabel}</Text>
-            <Text style={styles.statValue}>
-              {item.volume
-                ? item.volume > 1000000
-                  ? `${(item.volume / 1000000).toFixed(2)}${STRINGS.millionSuffix}`
-                  : item.volume > 1000
-                    ? `${(item.volume / 1000).toFixed(2)}${STRINGS.thousandSuffix}`
-                    : item.volume.toFixed(2)
-                : STRINGS.placeholder}
-            </Text>
+            <Text style={styles.statValue}>{formatVolume(item.volume)}</Text>
           </View>
         </View>
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{STRINGS.quoteVolLabel}</Text>
             <Text style={styles.statValue}>
-              {item.quoteVolume
-                ? item.quoteVolume > 1000000
-                  ? `${(item.quoteVolume / 1000000).toFixed(2)}${STRINGS.millionSuffix}`
-                  : item.quoteVolume > 1000
-                    ? `${(item.quoteVolume / 1000).toFixed(2)}${STRINGS.thousandSuffix}`
-                    : item.quoteVolume.toFixed(2)
-                : STRINGS.placeholder}
+              {formatVolume(item.quoteVolume)}
             </Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{STRINGS.tradesLabel}</Text>
-            <Text style={styles.statValue}>
-              {item.trades?.toLocaleString() ?? STRINGS.placeholder}
-            </Text>
+            <Text style={styles.statValue}>{formatTrades(item.trades)}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>{STRINGS.changeLabel}</Text>
             <Text
               style={{
                 ...styles.statValue,
-                color:
-                  item.priceChange >= 0
-                    ? COLORS.positiveText
-                    : COLORS.negativeText,
+                color: getChangeColor(item.priceChange, "text"),
               }}
             >
-              {item.priceChange?.toFixed(2)}
+              {formatChange(item.priceChange)}
             </Text>
           </View>
         </View>
@@ -143,111 +102,6 @@ const TickerItem: React.FC<TickerItemProps> = React.memo(({ item }) => {
   );
 });
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "column",
-    marginBottom: 12,
-    marginHorizontal: 16,
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  mainRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: COLORS.white,
-    width: "100%",
-    zIndex: 1,
-  },
-  leftContainer: {
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
-  },
-  logoContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.backgroundLight,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
-  },
-  logo: {
-    fontSize: 24,
-    textAlign: "center",
-  },
-  nameAndPriceContainer: {
-    flexDirection: "column",
-    gap: 4,
-  },
-  symbol: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: COLORS.textPrimary,
-    letterSpacing: 0.5,
-  },
-  price: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: COLORS.textSecondary,
-    letterSpacing: -0.5,
-  },
-  rightContainer: {
-    alignItems: "flex-end",
-  },
-  changePill: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  percentChange: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: COLORS.white,
-  },
-  statsContainer: {
-    width: "100%",
-    backgroundColor: COLORS.backgroundLight,
-    padding: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.borderLight,
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  statItem: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    flex: 1,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: COLORS.textLabel,
-    marginBottom: 4,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  statValue: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.textValue,
-  },
-});
+TickerItem.displayName = "TickerItem";
 
 export default TickerItem;
