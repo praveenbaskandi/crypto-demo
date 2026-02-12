@@ -1,0 +1,15 @@
+export const STRINGS = {
+    pricePrefix: '$',
+    positiveChangePrefix: '+',
+    percentSuffix: '%',
+    highLabel: 'High',
+    lowLabel: 'Low',
+    volLabel: 'Vol',
+    quoteVolLabel: 'Q.Vol',
+    tradesLabel: 'Trades',
+    changeLabel: 'Change',
+    placeholder: '-',
+    millionSuffix: 'M',
+    thousandSuffix: 'K',
+    cryptoTrackerTitle: 'Crypto Tracker',
+};

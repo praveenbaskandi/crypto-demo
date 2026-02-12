@@ -1,22 +1,25 @@
 import { StyleSheet } from "react-native";
+import { COLORS } from '../constants/color';
+
+
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: COLORS.backgroundApp,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderBottomWidth: 1,
-    borderBottomColor: "#ebebeb",
+    borderBottomColor: COLORS.borderHeader,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#000",
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -26,13 +29,13 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#1a1a1a",
+    color: COLORS.textPrimary,
     letterSpacing: -0.5,
   },
   statusContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: COLORS.statusPill,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,
@@ -46,7 +49,7 @@ export const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#666",
+    color: COLORS.textStatus,
   },
   listContainer: {
     flex: 1,

@@ -2,6 +2,8 @@ import { FlashList } from "@shopify/flash-list";
 import React from "react";
 import { StatusBar, Text, View } from "react-native";
 import TickerItem from "../components/TickerItem";
+import { COLORS } from "../constants/color";
+import { STRINGS } from "../constants/string";
 import { Ticker } from "../redux/types";
 import { styles } from "./CryptoList.styles";
 import { useCryptoList } from "./useCryptoList";
@@ -13,7 +15,7 @@ const CryptoList = () => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.header}>
-        <Text style={styles.title}>Crypto Tracker</Text>
+        <Text style={styles.title}>{STRINGS.cryptoTrackerTitle}</Text>
         <View style={styles.statusContainer}>
           <View
             style={[
@@ -21,10 +23,10 @@ const CryptoList = () => {
               {
                 backgroundColor:
                   connectionStatus === "connected"
-                    ? "green"
+                    ? COLORS.statusConnected
                     : connectionStatus === "connecting"
-                      ? "orange"
-                      : "red",
+                      ? COLORS.statusConnecting
+                      : COLORS.statusDisconnected,
               },
             ]}
           />
