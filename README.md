@@ -48,3 +48,14 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+
+## Screen Shot
+
+### Home Screen
+
+- This page show crypto list with prices updated using web socket.
+- When app move to background the api connection remove for perfoemance
+
+  <img width="150" height="300" alt="Simulator Screenshot - iPhone 16e - 2026-02-12 at 16 10 20" src="https://github.com/user-attachments/assets/019a14f0-a8ef-499e-9ce1-55abe26a2373" />
